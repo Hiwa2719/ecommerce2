@@ -1,11 +1,12 @@
 import React from 'react'
+import {Link} from "react-router-dom";
 
 const Header = () => {
     return (
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
                 <div className="container">
-                    <a className="navbar-brand" href="/">ZagrosShop</a>
+                    <Link className="navbar-brand" to="/">ZagrosShop</Link>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                             aria-expanded="false" aria-label="Toggle navigation">
@@ -14,12 +15,12 @@ const Header = () => {
                     <div className="collapse navbar-collapse" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="/cart/">
-                                    <i className="fas fa-shopping-cart text-light"></i> Cart</a>
+                                <Link className="nav-link active" aria-current="page" to="/cart/">
+                                    <i className="fas fa-shopping-cart text-light"></i> Cart</Link>
                             </li>
                             <li className="nav-item">
-                                <a className="nav-link active" aria-current="page" href="/login/">
-                                     <i className="fas fa-user text-light"></i> Login</a>
+                                <Link className="nav-link active" aria-current="page" to="/login/">
+                                     <i className="fas fa-user text-light"></i> Login</Link>
                             </li>
                         </ul>
                         <form className="d-flex">
