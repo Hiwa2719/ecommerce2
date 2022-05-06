@@ -1,12 +1,20 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Link, useParams} from 'react-router-dom'
 import Rating from '../components/Rating'
-import products from '../products'
+import axios from "axios";
 
 
 const ProductPage = () => {
+    const [product, setProduct] = useState([])
     const id = useParams().id
-    const product = products.find((p) => p._id == id)
+
+    useEffect(() => {
+        axios.get(`/api/products/${id}`)
+            .then(response => {
+                setProduct(response.data)
+            })
+    }, [])
+
     return (
         <div>
             <Link to="/" className="btn btn-light my-3">Go Back</Link>
@@ -49,7 +57,9 @@ const ProductPage = () => {
                                 </div>
                             </li>
                             <li className="list-group-item">
-                                <button className="w-100 btn btn-dark" disabled={product.countInStock == 0 } >Add to Cart</button>
+                                <button className="w-100 btn btn-dark" disabled={product.countInStock == 0}>Add to
+                                    Cart
+                                </button>
                             </li>
                         </ul>
                     </div>
