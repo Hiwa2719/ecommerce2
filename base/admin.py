@@ -7,7 +7,6 @@ class ProductModelAdmin(admin.ModelAdmin):
     readonly_fields = 'createdAt',
 
 
-
 admin.site.register(Order)
 admin.site.register(OrderItem)
 admin.site.register(Review)
