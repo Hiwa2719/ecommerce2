@@ -4,6 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import Home from './pages/Home'
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import ProductPage from "./pages/ProductPage";
+import CartPage from "./pages/CartPage";
 
 
 function App() {
@@ -14,7 +15,9 @@ function App() {
                 <div className="container">
                     <Routes>
                         <Route path="/" element={<Home/>}/>
-                        <Route path={"/product/:id"} element={<ProductPage/>}/>
+                        <Route path="/product/:id" element={<ProductPage/>}/>
+                        <Route path="/cart/:id" element={<CartPage/>}/>
+                        <Route path="/cart/" element={<CartPage/>}/>
                     </Routes>
                 </div>
             </main>

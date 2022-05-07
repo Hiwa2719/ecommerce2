@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {Link, useParams} from 'react-router-dom'
+import React, {useEffect, useState} from "react";
+import {Link, useParams, useNavigate} from 'react-router-dom'
 import Rating from '../components/Rating'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
@@ -9,6 +9,8 @@ import {listProductDetails} from "../actions/productActions";
 
 const ProductPage = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const [qty, setQty] = useState(1)
     const productDetails = useSelector(state => state.productDetails)
     const {loading, error, product} = productDetails
     const id = useParams().id
@@ -17,6 +19,10 @@ const ProductPage = () => {
         dispatch(listProductDetails(id))
     }, [dispatch, id])
 
+    const addToCartHandler = () => {
+        console.log('add to cart')
+        navigate(`/cart/${id}?qty=${qty}`)
+    }
 
     return (
         <div>
@@ -66,8 +72,25 @@ const ProductPage = () => {
                                                 </div>
                                             </div>
                                         </li>
+                                        {
+                                            product.countInStock > 0 && (
+                                                <li className="list-group-item">
+                                                    <div className="row">
+                                                        <div className="col">Qty</div>
+                                                        <div className="col">
+                                                                <select className="form-select" onChange={e => setQty(e.target.value)}>
+                                                                    {
+                                                                        [...Array(product.countInStock).keys()].map((x, index) => (
+                                                                            <option key={index} value={x + 1}>{x + 1}</option>
+                                                                        ))
+                                                                    }
+                                                                </select>
+                                                        </div>
+                                                    </div>
+                                                </li>)
+                                        }
                                         <li className="list-group-item">
-                                            <button className="w-100 btn btn-dark" disabled={product.countInStock == 0}>Add
+                                            <button className="w-100 btn btn-dark" disabled={product.countInStock == 0} onClick={addToCartHandler}>Add
                                                 to
                                                 Cart
                                             </button>
