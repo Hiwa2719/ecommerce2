@@ -90,7 +90,7 @@ const ProductPage = () => {
                                                 </li>)
                                         }
                                         <li className="list-group-item">
-                                            <button className="w-100 btn btn-dark" disabled={product.countInStock == 0} onClick={addToCartHandler}>Add
+                                            <button className="w-100 btn btn-dark" disabled={product.countInStock === 0} onClick={addToCartHandler}>Add
                                                 to
                                                 Cart
                                             </button>
