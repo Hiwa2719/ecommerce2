@@ -1,7 +1,16 @@
 import React from 'react'
 import {Link} from "react-router-dom";
+import {useSelector, useDispatch} from "react-redux";
+import {logout} from '../actions/userActions'
 
 const Header = () => {
+    const userLogin = useSelector(state => state.userLogin)
+    const {userInfo} = userLogin
+    const dispatch = useDispatch()
+
+    const logoutHandler = (e) => {
+        dispatch(logout())
+    }
     return (
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -18,10 +27,24 @@ const Header = () => {
                                 <Link className="nav-link active" aria-current="page" to="/cart/">
                                     <i className="fas fa-shopping-cart text-light"></i> Cart</Link>
                             </li>
-                            <li className="nav-item">
-                                <Link className="nav-link active" aria-current="page" to="/login/">
-                                     <i className="fas fa-user text-light"></i> Login</Link>
-                            </li>
+                            {
+                                userInfo ?
+                                    (
+                                        <li className="nav-item dropdown">
+                                            <a className="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+                                               role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Dropdown
+                                            </a>
+                                            <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <li><a className="dropdown-item" href="/profile/">Profile</a></li>
+                                                <li className="dropdown-item" onClick={logoutHandler}>Logout</li>
+                                            </ul>
+                                        </li>) :
+                                    (<li className="nav-item">
+                                        <Link className="nav-link active" aria-current="page" to="/login/">
+                                            <i className="fas fa-user text-light"></i> Login</Link>
+                                    </li>)
+                            }
                         </ul>
                         <form className="d-flex">
                             <input className="form-control me-2" type="search" placeholder="Search"

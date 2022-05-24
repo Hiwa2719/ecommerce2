@@ -1,6 +1,7 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import 'bootstrap/dist/css/bootstrap.min.css'
+import 'bootstrap/dist/js/bootstrap'
 import Home from './pages/Home'
 import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import ProductPage from "./pages/ProductPage";
