@@ -26,7 +26,7 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 
 @api_view()
-@permission_classes([IsAuthenticated, IsAdminUser])
+@permission_classes([IsAuthenticated])
 def get_user_profile(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
