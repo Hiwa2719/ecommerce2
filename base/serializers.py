@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth import password_validation
+from django.contrib.auth.hashers import make_password
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+
 from .models import Product
-from django.contrib.auth import password_validation
-from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -41,11 +43,14 @@ class UserSerializerWithToken(UserSerializer):
 
 class UserRegisterSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=200)
-    username = serializers.CharField(max_length=200)
-    password = serializers.CharField(style={'input_type': 'password'})
+    username = serializers.EmailField(max_length=200)
+    password = serializers.CharField(style={'input_type': 'password'}, required=False)
 
     def validate_username(self, username):
-        if User.objects.filter(username=username).exists():
+        queryset = User.objects.filter(username=username)
+        if self.instance:
+            queryset = queryset.exclude(username=self.instance.username)
+        if queryset.exists():
             raise serializers.ValidationError('this username already exists')
         return username
 
@@ -60,7 +65,16 @@ class UserRegisterSerializer(serializers.Serializer):
         name = validated_data.get('name')
         username = validated_data.get('username')
         password = validated_data.get('password')
-        return User.objects.create_user(first_name=name, username=username, password=password)
+        return User.objects.create_user(first_name=name, username=username, email=username, password=password)
+
+    def update(self, instance, validated_data):
+        instance.first_name = validated_data.get('name')
+        instance.username = validated_data.get('username')
+        instance.email = validated_data.get('username')
+        if validated_data.get('password') != '':
+            instance.password = make_password(validated_data.get('password'))
+        instance.save()
+        return instance
 
 
 class ProductSerializer(serializers.ModelSerializer):

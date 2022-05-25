@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from django.contrib.auth.hashers import make_password
 from .models import Product
 from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer
 
@@ -30,6 +30,18 @@ class MyTokenObtainPairView(TokenObtainPairView):
 def get_user_profile(request):
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_user_profile(request):
+    user = request.user
+    serializer = UserRegisterSerializer(user, request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        serializer = UserSerializerWithToken(user)
+        return Response(serializer.data)
+    return Response(serializer.errors)
 
 
 @api_view()
