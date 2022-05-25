@@ -38,33 +38,29 @@ class UserSerializerWithToken(UserSerializer):
         token = RefreshToken.for_user(obj)
         return str(token.access_token)
 
-from django.contrib.auth.forms import UserCreationForm
+
 class UserRegisterSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=200)
     username = serializers.CharField(max_length=200)
-    password1 = serializers.CharField(style={'input_type': 'password'})
-    password2 = serializers.CharField(style={'input_type': 'password'})
+    password = serializers.CharField(style={'input_type': 'password'})
 
     def validate_username(self, username):
         if User.objects.filter(username=username).exists():
             raise serializers.ValidationError('this username already exists')
         return username
 
-    def validate(self, attrs):
-        password2 = attrs.get('password2')
-        password1 = attrs.get('password1')
-        if password1 and password2 and password1 != password2:
-            raise serializers.ValidationError('The two password fields did not match')
-
+    def validate_password(self, password):
         try:
-            password_validation.validate_password(password2)
+            password_validation.validate_password(password)
         except ValidationError as exc:
             raise serializers.ValidationError(exc.messages)
-        return attrs
+        return password
 
     def create(self, validated_data):
+        name = validated_data.get('name')
         username = validated_data.get('username')
-        password = validated_data.get('password1')
-        return User.objects.create_user(username=username, password=password)
+        password = validated_data.get('password')
+        return User.objects.create_user(first_name=name, username=username, password=password)
 
 
 class ProductSerializer(serializers.ModelSerializer):
