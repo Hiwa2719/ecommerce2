@@ -168,7 +168,6 @@ export const userUpdateProfile = (name, username, password) => async (dispatch, 
         localStorage.setItem('userInfo', JSON.stringify(data))
 
     }catch (e) {
-        console.log(e)
         dispatch({
             type: USER_UPDATE_PROFILE_FAIL,
             payload: e.response && e.response.data

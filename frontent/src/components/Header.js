@@ -2,6 +2,7 @@ import React from 'react'
 import {Link} from "react-router-dom";
 import {useSelector, useDispatch} from "react-redux";
 import {logout} from '../actions/userActions'
+import {USER_DETAILS_RESET} from "../constants/userConstants";
 
 const Header = () => {
     const userLogin = useSelector(state => state.userLogin)
@@ -10,6 +11,7 @@ const Header = () => {
 
     const logoutHandler = (e) => {
         dispatch(logout())
+        dispatch({type: USER_DETAILS_RESET})
     }
     return (
         <header>
@@ -36,7 +38,7 @@ const Header = () => {
                                                 {userInfo.name}
                                             </a>
                                             <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
-                                                <li><a className="dropdown-item" href="/profile/">Profile</a></li>
+                                                <li><Link className="dropdown-item" to="/profile/">Profile</Link></li>
                                                 <li className="dropdown-item" onClick={logoutHandler}>Logout</li>
                                             </ul>
                                         </li>) :
