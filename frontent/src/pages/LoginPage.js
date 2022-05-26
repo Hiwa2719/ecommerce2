@@ -18,7 +18,7 @@ function LoginPage() {
 
     useEffect(() => {
         if (userInfo) {
-            navigate(redirect ? redirect : '/')
+            navigate(redirect ? `/${redirect}/` : '/')
         }
     }, [navigate, userInfo, redirect])
 
