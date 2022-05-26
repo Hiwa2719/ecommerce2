@@ -20,7 +20,6 @@ const ProductPage = () => {
     }, [dispatch, id])
 
     const addToCartHandler = () => {
-        console.log('add to cart')
         navigate(`/cart/${id}?qty=${qty}`)
     }
 
