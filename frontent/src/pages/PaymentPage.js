@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
 import FormContainer from "../components/FormContainer";
 import CheckoutSteps from "../components/CheckoutSteps";
+import {savePaymentMethod} from "../actions/cartActions";
 
 
 function PaymentPage() {
@@ -13,16 +14,18 @@ function PaymentPage() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
-    const [paymentMethod, setPaymentMethod] = useState()
+    const [paymentMethod, setPaymentMethod] = useState('PayPal')
+
+    if (!shippingAddress.address) {
+        navigate('/shipping/')
+    }
 
     useEffect(() => {
-        if (!shippingAddress.address) {
-            navigate('/shipping/')
-        }
     })
 
     const submitHandler = (e) => {
         e.preventDefault()
+        dispatch(savePaymentMethod(paymentMethod))
         navigate('/placeorder/')
     }
 
