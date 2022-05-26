@@ -9,6 +9,11 @@ import {
     USER_DETAILS_SUCCESS,
     USER_DETAILS_FAIL,
     USER_DETAILS_REQUEST,
+
+    USER_UPDATE_PROFILE_SUCCESS,
+    USER_UPDATE_PROFILE_REQUEST,
+    USER_UPDATE_PROFILE_RESET,
+    USER_UPDATE_PROFILE_FAIL,
 } from "../constants/userConstants";
 import axios from "axios";
 
@@ -82,8 +87,6 @@ export const register = (name, email, password) => async (dispatch) => {
         localStorage.setItem('userInfo', JSON.stringify(data))
 
     } catch (error) {
-        console.log(error)
-        console.log('hello world')
         dispatch({
             type: USER_REGISTER_FAIL,
             payload: error.response && error.response.data
@@ -116,13 +119,61 @@ export const getUserDetail = (id) => async (dispatch, getState) => {
         })
 
     } catch (error) {
-        console.log(error)
-        console.log('hello world')
         dispatch({
             type: USER_DETAILS_FAIL,
             payload: error.response && error.response.data
                 ? [error.response.data['username'], error.response.data['password']]
                 : error.message
+        })
+    }
+}
+
+
+export const userUpdateProfile = (name, username, password) => async (dispatch, getState) => {
+    try{
+        dispatch({
+            type: USER_UPDATE_PROFILE_REQUEST
+        })
+
+        const {userLogin: {userInfo}} = getState()
+
+        const config = {
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`
+            }
+        }
+
+        let update_data = {
+            name: name,
+            username: username,
+        }
+
+        if (password){
+            update_data['password'] = password
+        }
+
+        const {data} = await axios.put('/api/users/profile/update/', update_data, config)
+
+        dispatch({
+            type: USER_UPDATE_PROFILE_SUCCESS,
+            payload: data,
+        })
+
+        dispatch({
+            type: USER_LOGIN_SUCCESS,
+            payload: data,
+        })
+
+        localStorage.setItem('userInfo', JSON.stringify(data))
+
+    }catch (e) {
+        console.log(e)
+        dispatch({
+            type: USER_UPDATE_PROFILE_FAIL,
+            payload: e.response && e.response.data
+            ? [e.response.data['username'], e.response.data['password']]
+                : e.message
         })
     }
 }

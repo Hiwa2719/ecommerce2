@@ -41,7 +41,7 @@ def update_user_profile(request):
         user = serializer.save()
         serializer = UserSerializerWithToken(user)
         return Response(serializer.data)
-    return Response(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view()

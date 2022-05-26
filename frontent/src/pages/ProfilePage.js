@@ -1,9 +1,10 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigate} from "react-router-dom";
-import {getUserDetail} from "../actions/userActions";
+import {getUserDetail, userUpdateProfile} from "../actions/userActions";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
+import {USER_UPDATE_PROFILE_RESET} from "../constants/userConstants";
 
 
 function ProfilePage() {
@@ -21,25 +22,30 @@ function ProfilePage() {
     const userLogin = useSelector(state => state.userLogin)
     const {userInfo} = userLogin
 
+    const userUpdate = useSelector(state => state.userUpdateProfile)
+    const {success} = userUpdate
+
     useEffect(() => {
         if (!userInfo) {
             navigate('/login/')
         } else {
-            if (!user || !user.name) {
+            if (!user || !user.name || success) {
+                dispatch({type: USER_UPDATE_PROFILE_RESET})
                 dispatch(getUserDetail('profile'))
             } else {
                 setName(user.name)
                 setEmail(user.email)
             }
         }
-    }, [userInfo, navigate, dispatch, user])
+    }, [userInfo, navigate, dispatch, user, success])
 
     const submitHandler = (e) => {
         e.preventDefault()
         if (password !== confirmPassword) {
-            setMessage('passwords don\'t match')
+            setMessage('Passwords don\'t match')
         } else {
-            console.log('updating')
+            dispatch(userUpdateProfile(name, email, password))
+            setMessage('')
         }
     }
 
@@ -49,8 +55,8 @@ function ProfilePage() {
 
             <div className="col-md-3">
                 <h2>User Profile</h2>
-                {message && <Message alertType="alert-danger">{error}</Message>}
-                {error && error.map((e, index) => <Message alertType="alert-danger" key={index}>{e}</Message>)}
+                {message && <Message alertType="alert-danger">{message}</Message>}
+                {error && error.map((e, index) => <Message key={index} alertType="alert-danger">{e}</Message>)}
                 <form onSubmit={submitHandler}>
                     <label htmlFor="name" className="mt-3">Name</label>
                     <input type="text" id="name" className="form-control" value={name} placeholder="Enter Name"
