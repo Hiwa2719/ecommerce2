@@ -17,13 +17,12 @@ function ProfilePage() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const userDetails = useSelector(state => state.userDetails)
-    const {error, loading, user} = userDetails
-
+    const {error: detailErrors, loading, user} = userDetails
     const userLogin = useSelector(state => state.userLogin)
     const {userInfo} = userLogin
 
     const userUpdate = useSelector(state => state.userUpdateProfile)
-    const {success} = userUpdate
+    const {error: updateErrors, success} = userUpdate
 
     useEffect(() => {
         if (!userInfo) {
@@ -32,7 +31,7 @@ function ProfilePage() {
             if (!user || !user.name || success) {
                 dispatch({type: USER_UPDATE_PROFILE_RESET})
                 dispatch(getUserDetail('profile'))
-            } else {
+            }else {
                 setName(user.name)
                 setEmail(user.email)
             }
@@ -56,7 +55,10 @@ function ProfilePage() {
             <div className="col-md-3">
                 <h2>User Profile</h2>
                 {message && <Message alertType="alert-danger">{message}</Message>}
-                {error && error.map((e, index) => <Message key={index} alertType="alert-danger">{e}</Message>)}
+                {detailErrors && detailErrors.map((e, index) => <Message key={index}
+                                                                         alertType="alert-danger">{e}</Message>)}
+                {updateErrors && updateErrors.map((e, index) => <Message key={index}
+                                                                         alertType="alert-danger">{e}</Message>)}
                 <form onSubmit={submitHandler}>
                     <label htmlFor="name" className="mt-3">Name</label>
                     <input type="text" id="name" className="form-control" value={name} placeholder="Enter Name"

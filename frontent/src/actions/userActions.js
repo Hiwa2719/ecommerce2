@@ -90,7 +90,7 @@ export const register = (name, email, password) => async (dispatch) => {
         dispatch({
             type: USER_REGISTER_FAIL,
             payload: error.response && error.response.data
-                ? [error.response.data['username'], error.response.data['password']]
+                ? Object.values(error.response.data)
                 : error.message
         })
     }
@@ -122,7 +122,7 @@ export const getUserDetail = (id) => async (dispatch, getState) => {
         dispatch({
             type: USER_DETAILS_FAIL,
             payload: error.response && error.response.data
-                ? [error.response.data['username'], error.response.data['password']]
+                ? Object.values(error.response.data)
                 : error.message
         })
     }
@@ -171,7 +171,7 @@ export const userUpdateProfile = (name, username, password) => async (dispatch, 
         dispatch({
             type: USER_UPDATE_PROFILE_FAIL,
             payload: e.response && e.response.data
-            ? [e.response.data['username'], e.response.data['password']]
+            ? Object.values(e.response.data)
                 : e.message
         })
     }
