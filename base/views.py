@@ -5,8 +5,8 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from django.contrib.auth.hashers import make_password
-from .models import Product
+
+from .models import Product, Order, OrderItem, ShippingAddress
 from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer
 
 User = get_user_model()
@@ -74,3 +74,48 @@ def get_product(request, pk):
     product = Product.objects.get(pk=pk)
     serializer = ProductSerializer(product)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_order_items(request):
+    user = request.user
+    data = request.data
+
+    cart_items = data.get('orderItems')
+    if cart_items:
+        order = Order.objects.create(
+            user=user,
+            paymentMethod=data.get('paymentMethod'),
+            taxPrice=data.get('taxPrice'),
+            shippingPrice=data.get('shippingPrice'),
+            totalPrice=data.get('totalPrice'),
+        )
+
+        shipping = ShippingAddress.objects.create(
+            order=order,
+            address=data.get('shippingAddress').get('address'),
+            city=data.get('shippingAddress').get('city'),
+            postalCode=data.get('shippingAddress').get('postCode'),
+            country=data.get('shippingAddress').get('country'),
+        )
+        for item in cart_items:
+            try:
+                product = Product.objects.get(id=item['product'])
+            except Product.DoesNotExist:
+                return Response({'details': 'Product Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+
+            order_item = OrderItem.objects.create(
+                product=product,
+                order=order,
+                name=product.name,
+                image=product.image.url,
+                price=item.get('price'),
+                qty=item.get('qty'),
+            )
+
+            product.countInStock -= item.get('qty')
+            product.save()
+            return Response()
+
+    return Response({'details': 'No order items'}, status=status.HTTP_400_BAD_REQUEST)

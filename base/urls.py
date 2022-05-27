@@ -17,7 +17,12 @@ users_urls = [
     path('profile/update/', views.update_user_profile, name='update-user-profile'),
 ]
 
+order_urls = [
+    path('add/', views.add_order_items, name='add-order'),
+]
+
 urlpatterns = [
     path('products/', include(product_urls)),
-    path('users/', include(users_urls))
+    path('users/', include(users_urls)),
+    path('orders/', include(order_urls)),
 ]
