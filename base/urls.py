@@ -19,6 +19,8 @@ users_urls = [
 
 order_urls = [
     path('add/', views.add_order_items, name='add-order'),
+    path('<int:pk>/', views.get_order_by_id, name='get-order'),
+    path('', views.get_orders, name='get-orders'),
 ]
 
 urlpatterns = [

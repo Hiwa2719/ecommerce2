@@ -7,7 +7,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Product, Order, OrderItem, ShippingAddress
-from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer, OrderSerializer
+from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer, \
+    OrderSerializer
 
 User = get_user_model()
 
@@ -121,3 +122,25 @@ def add_order_items(request):
             return Response(serializer.data)
 
     return Response({'details': 'No order items'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def get_orders(request):
+    orders = Order.objects.filter(user=request.user)
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def get_order_by_id(request, pk):
+    user = request.user
+    try:
+        order = Order.objects.get(pk=pk)
+        if user.is_staff or order.user == user:
+            serializer = OrderSerializer(order)
+            return Response(serializer.data)
+        return Response({'detail': 'Not authorized to request this order.'}, status=status.HTTP_400_BAD_REQUEST)
+    except Order.DoesNotExist:
+        return Response({'detail': 'Order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
