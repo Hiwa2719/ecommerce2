@@ -4,6 +4,7 @@ import CheckoutSteps from "../components/CheckoutSteps";
 import Message from "../components/Message";
 import {Link, useNavigate} from "react-router-dom";
 import {orderCreateAction} from "../actions/orderActions";
+import {ORDER_CREATE_RESET} from "../constants/orderConstants";
 
 
 function PlaceOrderPage() {
@@ -35,6 +36,7 @@ function PlaceOrderPage() {
     useEffect(() => {
         if (success) {
             navigate(`/order/${order._id}`)
+            dispatch({type: ORDER_CREATE_RESET})
         }
         if (!cart.paymentMethod) {
             navigate('/payment/')

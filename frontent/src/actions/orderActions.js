@@ -1,5 +1,6 @@
 import {ORDER_CREATE_FAIL, ORDER_CREATE_REQUEST, ORDER_CREATE_SUCCESS} from "../constants/orderConstants";
 import axios from "axios";
+import {CART_CLEAR_ITEMS} from "../constants/cartConstants";
 
 
 export const orderCreateAction = (order) => async (dispatch, getState) => {
@@ -22,6 +23,12 @@ export const orderCreateAction = (order) => async (dispatch, getState) => {
             type: ORDER_CREATE_SUCCESS,
             payload: data
         })
+
+        dispatch({
+            type: CART_CLEAR_ITEMS
+        })
+
+        localStorage.removeItem('cartItems')
 
     } catch (e) {
         dispatch({
