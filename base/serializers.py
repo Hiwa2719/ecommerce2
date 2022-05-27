@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Product
+from .models import Product, Order, OrderItem, ShippingAddress
 
 User = get_user_model()
 
@@ -80,4 +80,43 @@ class UserRegisterSerializer(serializers.Serializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
+        fields = '__all__'
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    orderItems = serializers.SerializerMethodField()
+    shippingAddress = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def get_orderItems(self, order):
+        items = order.orderitem_set.all()
+        serializer = OrderItemsSerializer(items, many=True)
+        return serializer.data
+
+    def get_shippingAddress(self, order):
+        try:
+            shipping_address = order.shippingaddress
+            data = ShippingAddressSerializer(shipping_address).data
+        except:
+            data = False
+        return data
+
+    def get_user(self, order):
+        serializer = UserSerializer(order.user)
+        return serializer.data
+    
+
+class OrderItemsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
+
+class ShippingAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShippingAddress
         fields = '__all__'

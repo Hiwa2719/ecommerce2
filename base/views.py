@@ -7,7 +7,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 from .models import Product, Order, OrderItem, ShippingAddress
-from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer
+from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer, OrderSerializer
 
 User = get_user_model()
 
@@ -116,6 +116,8 @@ def add_order_items(request):
 
             product.countInStock -= item.get('qty')
             product.save()
-            return Response()
+
+            serializer = OrderSerializer(order)
+            return Response(serializer.data)
 
     return Response({'details': 'No order items'}, status=status.HTTP_400_BAD_REQUEST)
