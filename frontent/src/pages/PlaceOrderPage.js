@@ -1,11 +1,17 @@
-import React from "react";
-import {useSelector} from "react-redux";
+import React, {useEffect} from "react";
+import {useDispatch, useSelector} from "react-redux";
 import CheckoutSteps from "../components/CheckoutSteps";
 import Message from "../components/Message";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {orderCreateAction} from "../actions/orderActions";
 
 
 function PlaceOrderPage() {
+
+    const navigate = useNavigate()
+    const orderCreate = useSelector(state => state.orderCreate)
+    const {order, error, success} = orderCreate
+
     const cart = useSelector(state => state.cart)
     cart.itemsPrice = Number(cart.cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)).toFixed(2)
     cart.shippingPrice = Number(cart.itemsPrice > 100 ? 0 : 10).toFixed(2)
@@ -13,9 +19,28 @@ function PlaceOrderPage() {
 
     cart.totalPrice = (Number(cart.itemsPrice) + Number(cart.shippingPrice) + Number(cart.taxPrice)).toFixed(2)
 
-    const placeOrder = (e) =>{
-        console.log('place order')
+    const dispatch = useDispatch()
+
+    const placeOrder = (e) => {
+        dispatch(orderCreateAction({
+            orderItems: cart.cartItems,
+            paymentMethod: cart.paymentMethod,
+            taxPrice: cart.taxPrice,
+            shippingPrice: cart.shippingPrice,
+            totalPrice: cart.totalPrice,
+            shippingAddress: cart.shippingAddress,
+        }))
     }
+
+    useEffect(() => {
+        if (success) {
+            navigate(`/order/${order._id}`)
+        }
+        if (!cart.paymentMethod) {
+            navigate('/payment/')
+        }
+    }, [success, navigate])
+
     return (
         <div>
             <CheckoutSteps step1 step2 step3 step4/>
@@ -78,30 +103,36 @@ function PlaceOrderPage() {
                             </li>
                             <li className="list-group-item">
                                 <div className="row">
-                                    <div className="col">Items: </div>
+                                    <div className="col">Items:</div>
                                     <div className="col">${cart.itemsPrice}</div>
                                 </div>
                             </li>
                             <li className="list-group-item">
                                 <div className="row">
-                                    <div className="col">Shipping: </div>
+                                    <div className="col">Shipping:</div>
                                     <div className="col">${cart.shippingPrice}</div>
                                 </div>
                             </li>
                             <li className="list-group-item">
                                 <div className="row">
-                                    <div className="col">Tax: </div>
+                                    <div className="col">Tax:</div>
                                     <div className="col">${cart.taxPrice}</div>
                                 </div>
                             </li>
                             <li className="list-group-item">
                                 <div className="row">
-                                    <div className="col">Total Price: </div>
+                                    <div className="col">Total Price:</div>
                                     <div className="col">${cart.totalPrice}</div>
                                 </div>
                             </li>
+                            {error && (
+                                <li className="list-group-item">
+                                    <Message alertType="alert-danger">{error}</Message>
+                                </li>
+                            )}
                             <li className="list-group-item">
-                                <button className="btn btn-warning w-100" disabled={cart.cartItems.length === 0} onClick={placeOrder}>
+                                <button className="btn btn-warning w-100" disabled={cart.cartItems.length === 0}
+                                        onClick={placeOrder}>
                                     Place Order
                                 </button>
                             </li>

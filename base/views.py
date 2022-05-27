@@ -101,7 +101,7 @@ def add_order_items(request):
         )
         for item in cart_items:
             try:
-                product = Product.objects.get(id=item['product'])
+                product = Product.objects.get(_id=item['product'])
             except Product.DoesNotExist:
                 return Response({'details': 'Product Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 

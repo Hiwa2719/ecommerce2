@@ -2,7 +2,7 @@ import {ORDER_CREATE_FAIL, ORDER_CREATE_REQUEST, ORDER_CREATE_SUCCESS} from "../
 import axios from "axios";
 
 
-export const orderActions = (order) => async (dispatch, getState) => {
+export const orderCreateAction = (order) => async (dispatch, getState) => {
     try {
         dispatch({
             type: ORDER_CREATE_REQUEST
@@ -26,7 +26,7 @@ export const orderActions = (order) => async (dispatch, getState) => {
     } catch (e) {
         dispatch({
             type: ORDER_CREATE_FAIL,
-            payload: e
+            payload: e.response.data.details
         })
     }
 }

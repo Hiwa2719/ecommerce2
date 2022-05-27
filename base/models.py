@@ -45,14 +45,14 @@ class Order(models.Model):
     taxPrice = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     shippingPrice = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
     totalPrice = models.DecimalField(max_digits=7, decimal_places=2, blank=True, null=True)
-    isPaid = models.BooleanField()
+    isPaid = models.BooleanField(default=False)
     paidAt = models.DateTimeField(blank=True, null=True)
-    isDelivered = models.BooleanField()
+    isDelivered = models.BooleanField(default=False)
     deliveredAt = models.DateTimeField(blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def __str__(self):
-        return self.createdAt
+        return str(self.createdAt)
 
 
 class OrderItem(models.Model):
