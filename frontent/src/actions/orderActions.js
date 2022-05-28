@@ -52,7 +52,7 @@ export const getOrderDetailsAction = (id) =>async (dispatch, getState) => {
 
         const {userLogin: {userInfo}} = getState()
 
-        config = {
+        const config = {
             headers: {
                 'Content-type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`

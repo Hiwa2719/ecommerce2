@@ -97,7 +97,7 @@ def add_order_items(request):
             order=order,
             address=data.get('shippingAddress').get('address'),
             city=data.get('shippingAddress').get('city'),
-            postalCode=data.get('shippingAddress').get('postCode'),
+            postalCode=data.get('shippingAddress').get('postalCode'),
             country=data.get('shippingAddress').get('country'),
         )
         for item in cart_items:

@@ -83,7 +83,7 @@ function PlaceOrderPage() {
                                                     </div>
                                                     <div className="col">
                                                         <Link to={`/product/${item.product}?redirect='/placeorder/'`}
-                                                              className="text-decoration-none text-light">{item.name}</Link>
+                                                              className="text-decoration-none text-dark">{item.name}</Link>
                                                     </div>
                                                     <div className="col-md-4">
                                                         {item.qty} x ${item.price} =
