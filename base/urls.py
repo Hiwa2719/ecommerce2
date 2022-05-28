@@ -28,4 +28,5 @@ urlpatterns = [
     path('products/', include(product_urls)),
     path('users/', include(users_urls)),
     path('orders/', include(order_urls)),
+    path('stripe-payment/<int:pk>/', views.stripe_payment, name='stripe-payment'),
 ]

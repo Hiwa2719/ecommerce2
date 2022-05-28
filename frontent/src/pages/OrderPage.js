@@ -1,11 +1,13 @@
 import React, {useEffect} from "react";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {getOrderDetailsAction} from "../actions/orderActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import axios from "axios";
 
 function OrderPage() {
+    const navigate = useNavigate()
     const id = useParams().id
     const dispatch = useDispatch()
     const orderDetails = useSelector(state => state.orderDetails)
@@ -20,6 +22,16 @@ function OrderPage() {
             dispatch(getOrderDetailsAction(id))
         }
     }, [dispatch, order, id])
+
+    const checkoutHandler = (e) => {
+        axios.get(`/api/stripe-payment/${order._id}/`)
+            .then(response => {
+                window.location.href = response.data.stripe_checkout_url
+            })
+            .catch(e => {
+                console.log(e)
+            })
+    }
 
     return loading ? <Loader/> : error ? (
             <Message alertType="alert-danger">{error}</Message>
@@ -44,7 +56,7 @@ function OrderPage() {
                                 </p>
                                 {order.isDelivered ? (
                                     <Message alertType="alert-success">Delivered on {order.deliveredAt}</Message>
-                                ):(
+                                ) : (
                                     <Message alertType="alert-dark">Not Delivered</Message>
                                 )}
                             </li>
@@ -56,7 +68,7 @@ function OrderPage() {
                                 </p>
                                 {order.isPaid ? (
                                     <Message alertType="alert-success">Paid on {order.paidAt}</Message>
-                                ):(
+                                ) : (
                                     <Message alertType="alert-dark">Not Paid</Message>
                                 )}
                             </li>
@@ -117,6 +129,11 @@ function OrderPage() {
                                         <div className="col">Total:</div>
                                         <div className="col">${order.totalPrice}</div>
                                     </div>
+                                </div>
+                                <div className="list-group-item">
+                                    <button type="submit" className="btn btn-success w-100 my-2 py-2" onClick={checkoutHandler}>
+                                        Checkout
+                                    </button>
                                 </div>
                             </div>
                         </div>
