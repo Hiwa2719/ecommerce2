@@ -19,7 +19,7 @@ function OrderPage() {
         if (!order || order._id !== Number(id)) {
             dispatch(getOrderDetailsAction(id))
         }
-    }, [order, id])
+    }, [dispatch, order, id])
 
     return loading ? <Loader/> : error ? (
             <Message alertType="alert-danger">{error}</Message>
