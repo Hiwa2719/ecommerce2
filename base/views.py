@@ -144,3 +144,17 @@ def get_order_by_id(request, pk):
         return Response({'detail': 'Not authorized to request this order.'}, status=status.HTTP_400_BAD_REQUEST)
     except Order.DoesNotExist:
         return Response({'detail': 'Order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_order_to_paid(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+        if order.user == request.user:
+            order.make_paid()
+            serializer = OrderSerializer(order)
+            return Response(serializer.data)
+        return Response({'detail': 'You are not authorized to do this action.'})
+    except Order.DoesNotExist:
+        return Response({'detail': 'This order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)

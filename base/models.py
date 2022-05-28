@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
@@ -53,6 +55,16 @@ class Order(models.Model):
 
     def __str__(self):
         return str(self.createdAt)
+
+    def make_paid(self):
+        self.isPaid = True
+        self.paidAt = datetime.now()
+        self.save()
+
+    def make_delivered(self):
+        self.isDelivered = True
+        self.deliveredAt = datetime.now()
+        self.save()
 
 
 class OrderItem(models.Model):
