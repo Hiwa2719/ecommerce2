@@ -31,13 +31,22 @@ function OrderPage() {
                     <div className="col-md-8">
                         <ul className="list-group">
                             <li className="list-group-item">
-                                <h2>Shippnig</h2>
+                                <h2>Shipping</h2>
+                                <p><strong>Name: </strong>{order.user.name}</p>
+                                <p><strong>Email: </strong><a href={`mailto:${order.user.email}`}
+                                                              className="text-decoration-none">{order.user.email}</a>
+                                </p>
                                 <p>
                                     <strong>Shipping: </strong>
                                     {order.shippingAddress.address}, {order.shippingAddress.city},
                                     {' '}
                                     {order.shippingAddress.postalCode}, {order.shippingAddress.country}
                                 </p>
+                                {order.isDelivered ? (
+                                    <Message alertType="alert-success">Delivered on {order.deliveredAt}</Message>
+                                ):(
+                                    <Message alertType="alert-dark">Not Delivered</Message>
+                                )}
                             </li>
                             <li className="list-group-item">
                                 <h2>Payment Method</h2>
@@ -45,6 +54,11 @@ function OrderPage() {
                                     <strong>Method: </strong>
                                     {order.paymentMethod}
                                 </p>
+                                {order.isPaid ? (
+                                    <Message alertType="alert-success">Paid on {order.paidAt}</Message>
+                                ):(
+                                    <Message alertType="alert-dark">Not Paid</Message>
+                                )}
                             </li>
                             <li className="list-group-item">
                                 <h2>Orders Items</h2>
