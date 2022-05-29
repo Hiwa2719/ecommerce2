@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {getUserDetail, userUpdateProfile} from "../actions/userActions";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
 import {USER_UPDATE_PROFILE_RESET} from "../constants/userConstants";
+import {getOrderListAction} from "../actions/orderActions";
 
 
 function ProfilePage() {
@@ -24,14 +25,21 @@ function ProfilePage() {
     const userUpdate = useSelector(state => state.userUpdateProfile)
     const {error: updateErrors, success} = userUpdate
 
+    const orderList = useSelector(state => state.orderList)
+    const {errors: errorOrders, loading: loadingOrders, orders} = orderList
+
     useEffect(() => {
         if (!userInfo) {
             navigate('/login/')
         } else {
+            if (orders && orders.length === 0) {
+                console.log('orders', orders)
+                dispatch(getOrderListAction())
+            }
             if (!user || !user.name || success) {
                 dispatch({type: USER_UPDATE_PROFILE_RESET})
                 dispatch(getUserDetail('profile'))
-            }else {
+            } else {
                 setName(user.name)
                 setEmail(user.email)
             }
@@ -79,8 +87,44 @@ function ProfilePage() {
                     <input type="submit" value="Update" className="btn btn-primary my-3"/>
                 </form>
             </div>
-            <div className="col-md-9"></div>
-
+            <div className="col-md-9">
+                <h2>My Orders</h2>
+                {loadingOrders ? <Loader/> : errorOrders ? <Message alertType="alert-danger">{errorOrders}</Message> : (
+                    <table className="table table-striped table-sm table-hover">
+                        <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">ID</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Paid</th>
+                            <th scope="col">Delivered</th>
+                            <th scope="col"></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {orders.map((order, index) => (
+                            <tr key={index}>
+                                <th scope="row">{index}</th>
+                                <td>{order._id}</td>
+                                <td>{order.createdAt.substring(0, 10)}</td>
+                                <td>{order.totalPrice}</td>
+                                <td>{order.isPaid ? order.paidAt.substring(0, 10) : (
+                                    <i className="fas fa-times" style={{color: 'red'}}></i>
+                                )}</td>
+                                <td>{order.isDelivered ? order.deliveredAt.substring(0, 10) : (
+                                    <i className="fas fa-times" style={{color: 'red'}}></i>
+                                )}</td>
+                                <td>
+                                    <Link to={`/order/${order._id}/`}
+                                          className="btn btn-outline-dark btn-sm">Detail</Link>
+                                </td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
+                )}
+            </div>
         </div>
     )
 }
