@@ -1,5 +1,8 @@
 import stripe
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.shortcuts import redirect
+from django.urls import reverse
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -148,16 +151,24 @@ def get_order_by_id(request, pk):
         return Response({'detail': 'Order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
+def check_session(stripe_session_id):
+    """this checks stripe session if it's paid or not"""
+    return stripe.checkout.Session.retrieve(stripe_session_id).get('payment_status') == 'paid'
+
+
+@api_view()
 @permission_classes([IsAuthenticated])
 def update_order_to_paid(request, pk):
     try:
         order = Order.objects.get(pk=pk)
-        if order.user == request.user:
+
+        if not order.isPaid and check_session(order.stripe_session_id) and order.user == request.user:
             order.make_paid()
-            serializer = OrderSerializer(order)
-            return Response(serializer.data)
-        return Response({'detail': 'You are not authorized to do this action.'})
+            if settings.DEBUG:
+                return Response({'detail': 'order is updated now'})
+            return redirect(reverse('base:pay-order', kwargs={'pk': order.pk}))
+
+        return Response({'detail': 'You are not authorized to do this action.'}, status=status.HTTP_400_BAD_REQUEST)
     except Order.DoesNotExist:
         return Response({'detail': 'This order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -166,29 +177,45 @@ stripe.api_key = STRIPE_API_KEYS.SK
 
 
 @api_view()
+@permission_classes([IsAuthenticated])
 def stripe_payment(request, pk):
     try:
         order = Order.objects.get(pk=pk)
+
+        if order.isPaid:
+            return Response({'detail': 'This order is already being paid.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif order.stripe_session_id and check_session(order.stripe_session_id):
+            return redirect(reverse('base:pay-order', kwargs={'pk': order.pk}))
+
+        try:
+            if settings.DEBUG:
+                success_url = f'http://localhost:3000/order/{order._id}/'
+            else:
+                success_url = reverse('base:pay-order', kwargs={'pk': order.pk})
+
+            checkout_session = stripe.checkout.Session.create(
+                line_items=[
+                    {
+                        # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                        "price_data": {
+                            "unit_amount": int(order.totalPrice * 100),
+                            "currency": "usd",
+                            "product_data": {'name': 'Buy Receipt From ZagrosShop'},
+                        },
+                        "quantity": 1,
+                    }
+                ],
+                mode='payment',
+                success_url=success_url,
+                cancel_url=success_url,
+            )
+            order.stripe_session_id = checkout_session.id
+            order.save()
+
+            return Response({'stripe_checkout_url': checkout_session.url})
+
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
     except Order.DoesNotExist:
         return Response({'detail': 'This order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    try:
-        checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
-                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                    "price_data": {
-                        "unit_amount": int(order.totalPrice * 100),
-                        "currency": "usd",
-                        "product_data": {'name': 'Buy Receipt From ZagrosShop'},
-                    },
-                    "quantity": 1,
-                }
-            ],
-            mode='payment',
-            success_url='http://localhost:3000/order/11/',
-            cancel_url='http://localhost:3000/order/11/',
-        )
-    except Exception as e:
-        return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-    return Response({'stripe_checkout_url': checkout_session.url})

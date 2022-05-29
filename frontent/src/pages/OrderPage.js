@@ -1,35 +1,57 @@
 import React, {useEffect} from "react";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import {Link, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {getOrderDetailsAction} from "../actions/orderActions";
+import {getOrderDetailsAction, payOrderAction} from "../actions/orderActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import axios from "axios";
+import {ORDER_PAY_RESET} from "../constants/orderConstants";
 
 function OrderPage() {
-    const navigate = useNavigate()
     const id = useParams().id
     const dispatch = useDispatch()
     const orderDetails = useSelector(state => state.orderDetails)
     const {error, order, loading} = orderDetails
+
+    const userLogin = useSelector(state => state.userLogin)
+    const {userInfo} = userLogin
+
+    const orderPay = useSelector(state => state.orderPay)
+    const {success} = orderPay
 
     if (!loading && !error) {
         order.itemssPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
     }
 
     useEffect(() => {
-        if (!order || order._id !== Number(id)) {
+        if (!order || order._id !== Number(id) || success) {
+            dispatch({type: ORDER_PAY_RESET})
             dispatch(getOrderDetailsAction(id))
+        } else {
+            if (order.stripe_session_id && !order.isPaid && !loading) {
+                dispatch(payOrderAction(order._id))
+            }
         }
-    }, [dispatch, order, id])
+
+    }, [order, id, success])
 
     const checkoutHandler = (e) => {
-        axios.get(`/api/stripe-payment/${order._id}/`)
+        const config = {
+            headers: {
+                Authorization: `Bearer ${userInfo.token}`
+            }
+        }
+        axios.get(`/api/stripe-payment/${order._id}/`, config)
             .then(response => {
-                window.location.href = response.data.stripe_checkout_url
+                if (response.data.stripe_checkout_url) {
+                    window.location.href = response.data.stripe_checkout_url
+                } else {
+                    dispatch(getOrderDetailsAction(id))
+                }
             })
             .catch(e => {
                 console.log(e)
+                dispatch(getOrderDetailsAction(id))
             })
     }
 
@@ -131,7 +153,8 @@ function OrderPage() {
                                     </div>
                                 </div>
                                 <div className="list-group-item">
-                                    <button type="submit" className="btn btn-success w-100 my-2 py-2" onClick={checkoutHandler}>
+                                    <button className="btn btn-success w-100 my-2 py-2"
+                                            onClick={checkoutHandler}>
                                         Checkout
                                     </button>
                                 </div>

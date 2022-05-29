@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import pytz
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.urls import reverse
@@ -52,18 +53,19 @@ class Order(models.Model):
     isDelivered = models.BooleanField(default=False)
     deliveredAt = models.DateTimeField(blank=True, null=True)
     createdAt = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    stripe_session_id = models.TextField(blank=True)
 
     def __str__(self):
         return str(self.createdAt)
 
     def make_paid(self):
         self.isPaid = True
-        self.paidAt = datetime.now()
+        self.paidAt = datetime.now(tz=pytz.UTC)
         self.save()
 
     def make_delivered(self):
         self.isDelivered = True
-        self.deliveredAt = datetime.now()
+        self.deliveredAt = datetime.now(tz=pytz.UTC)
         self.save()
 
 
