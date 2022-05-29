@@ -152,12 +152,14 @@ function OrderPage() {
                                         <div className="col">${order.totalPrice}</div>
                                     </div>
                                 </div>
-                                <div className="list-group-item">
-                                    <button className="btn btn-success w-100 my-2 py-2"
-                                            onClick={checkoutHandler}>
-                                        Checkout
-                                    </button>
-                                </div>
+                                {!order.isPaid && (
+                                    <div className="list-group-item">
+                                        <button className="btn btn-success w-100 my-2 py-2"
+                                                onClick={checkoutHandler}>
+                                            Checkout
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
