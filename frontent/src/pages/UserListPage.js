@@ -58,7 +58,7 @@ function UserListPage() {
                                             <i className="fas fa-check" style={{color: 'red'}}></i>
                                         )}</td>
                                         <td>
-                                            <Link to={`/admin/users/${user._id}`} className="btn btn-sm btn-light">
+                                            <Link to={`/admin/users-list/edit/${user._id}`} className="btn btn-sm btn-light">
                                                 <i className="fas fa-edit"></i>
                                             </Link>
                                             <button className="btn btn-danger btn-sm" onClick={() => deleteUser(user._id)}>

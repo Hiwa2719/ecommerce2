@@ -33,8 +33,15 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
 @api_view()
 @permission_classes([IsAuthenticated])
-def get_user_profile(request):
-    serializer = UserSerializer(request.user)
+def get_user_profile(request, pk):
+    if pk == 'profile':
+        user = request.user
+    else:
+        try:
+            user = User.objects.get(pk=pk)
+        except User.DoesNotExists:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    serializer = UserSerializer(user)
     return Response(serializer.data)
 
 
