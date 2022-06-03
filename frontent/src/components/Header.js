@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from "react-router-dom";
-import {useSelector, useDispatch} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import {logout} from '../actions/userActions'
 import {USER_DETAILS_RESET} from "../constants/userConstants";
 
@@ -47,6 +47,19 @@ const Header = () => {
                                             <i className="fas fa-user text-light"></i> Login</Link>
                                     </li>)
                             }
+                            {userInfo && userInfo.isAdmin && (
+                                <li className="nav-item dropdown">
+                                    <a className="nav-link dropdown-toggle" href="#" id="admin-menu"
+                                       role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Admin
+                                    </a>
+                                    <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <li><Link className="dropdown-item" to="/admin/users-list/">Users</Link></li>
+                                        <li><Link className="dropdown-item" to="/admin/products-list/">Products</Link></li>
+                                        <li><Link className="dropdown-item" to="/admin/orders-list/">Orders</Link></li>
+                                    </ul>
+                                </li>
+                            )}
                         </ul>
                         <form className="d-flex">
                             <input className="form-control me-2" type="search" placeholder="Search"

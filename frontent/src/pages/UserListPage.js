@@ -3,20 +3,27 @@ import {useDispatch, useSelector} from "react-redux";
 import {getUsersListAction} from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 function UserListPage() {
+    const navigate = useNavigate()
 
     const dispatch = useDispatch()
     const usersList = useSelector(state => state.usersList)
     const {error, loading, users} = usersList
+
+    const {userInfo} = useSelector(state => state.userLogin)
 
     const deleteUser = (id)=>{
         console.log(id)
     }
 
     useEffect(() => {
+        if (userInfo && userInfo.isAdmin){
         dispatch(getUsersListAction())
+        }else{
+            navigate('/login')
+        }
     }, [dispatch])
 
     return (
