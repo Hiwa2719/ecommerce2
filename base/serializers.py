@@ -27,7 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_isAdmin(self, obj):
         return obj.is_staff
-
+    # def run_validation(self, data=empty):
 
 class UserSerializerWithToken(UserSerializer):
     token = serializers.SerializerMethodField(read_only=True)
@@ -71,6 +71,8 @@ class UserRegisterSerializer(serializers.Serializer):
         instance.first_name = validated_data.get('name')
         instance.username = validated_data.get('username')
         instance.email = validated_data.get('username')
+        if validated_data.get('is_staff'):
+            instance.is_staff = validated_data.get('is_staff')
         if validated_data.get('password') != '':
             instance.password = make_password(validated_data.get('password'))
         instance.save()

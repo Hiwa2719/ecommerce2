@@ -1,14 +1,16 @@
 import React, {useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-import {getUserDetail} from "../actions/userActions";
+import {getUserDetail, userUpdateAction} from "../actions/userActions";
+import {USER_UPDATE_RESET} from "../constants/userConstants";
 
 
 function UserEditPage() {
     const id = useParams().id
+    const navigate = useNavigate()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -17,12 +19,23 @@ function UserEditPage() {
     const dispatch = useDispatch()
 
     const {error, loading, user} = useSelector(state => state.userDetails)
+    const {error: updateError, loading: updateLoading, success: updateSuccess} = useSelector(state => state.userUpdate)
 
-    const submitHandler = () => {
-        console.log('submitting')
+    const submitHandler = (e) => {
+        e.preventDefault()
+
+        dispatch(userUpdateAction({
+            _id: user._id,
+            name, email, isAdmin
+        }))
     }
 
     useEffect(() => {
+        if (updateSuccess){
+            dispatch({type: USER_UPDATE_RESET})
+            navigate('/admin/users-list/')
+        }
+
         if (!user || user._id !== Number(id)) {
             dispatch(getUserDetail(id))
         } else {
@@ -30,7 +43,7 @@ function UserEditPage() {
             setEmail(user.email)
             setIsAdmin(user.isAdmin)
         }
-    }, [user, id])
+    }, [user, id, updateSuccess])
 
     return (
         <div>

@@ -15,6 +15,7 @@ users_urls = [
     path('login/', views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('<str:pk>/', views.get_user_profile, name='user-profile'),
     path('profile/update/', views.update_user_profile, name='update-user-profile'),
+    path('update/<int:pk>/', views.update_user, name='update-user'),
 ]
 
 order_urls = [

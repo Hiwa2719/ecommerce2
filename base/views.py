@@ -57,6 +57,26 @@ def update_user_profile(request):
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def update_user(request, pk):
+    try:
+        user = User.objects.get(pk=pk)
+        data = {
+            'name': request.data.get('name'),
+            'username': request.data.get('email')
+        }
+        serializer = UserRegisterSerializer(user, data)
+        if serializer.is_valid():
+            serializer.save(is_staff=request.data.get('isAdmin'))
+            user.refresh_from_db()
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view()
 @permission_classes([IsAdminUser])
 def get_users(request):
