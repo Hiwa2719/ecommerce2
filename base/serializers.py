@@ -71,7 +71,7 @@ class UserRegisterSerializer(serializers.Serializer):
         instance.first_name = validated_data.get('name')
         instance.username = validated_data.get('username')
         instance.email = validated_data.get('username')
-        if validated_data.get('is_staff'):
+        if validated_data.get('is_staff') is not None:
             instance.is_staff = validated_data.get('is_staff')
         if validated_data.get('password') != '':
             instance.password = make_password(validated_data.get('password'))
