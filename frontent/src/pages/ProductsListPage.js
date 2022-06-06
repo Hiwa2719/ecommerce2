@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import {Link, useNavigate} from "react-router-dom";
-import {listProducts} from "../actions/productActions";
+import {listProducts, productDeleteAction} from "../actions/productActions";
 
 
 function ProductsListPage() {
@@ -12,12 +12,17 @@ function ProductsListPage() {
     const dispatch = useDispatch()
     const {error, loading, products} = useSelector(state => state.productList)
 
+    const {
+        loading: deleteLoading,
+        error: deleteError,
+        success: deleteSuccess
+    } = useSelector(state => state.productDelete)
 
     const {userInfo} = useSelector(state => state.userLogin)
 
     const deleteProduct = (id) => {
         if (window.confirm('Are you sure you want to delete this product')) {
-            ///
+            dispatch(productDeleteAction(id))
         }
     }
 
@@ -31,7 +36,7 @@ function ProductsListPage() {
         } else {
             navigate('/login')
         }
-    }, [dispatch, userInfo, navigate])
+    }, [dispatch, userInfo, navigate, deleteSuccess])
 
     return (
         <div>
@@ -45,6 +50,10 @@ function ProductsListPage() {
                     </button>
                 </div>
             </div>
+
+            {deleteLoading && <Loader/>}
+            {deleteError && <Message alertType='alert-danger'>{deleteError}</Message>}
+
             {
                 loading ? <Loader/>
                     : error ?
