@@ -246,3 +246,14 @@ def stripe_payment(request, pk):
 
     except Order.DoesNotExist:
         return Response({'detail': 'This order does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAdminUser])
+def delete_product(request, pk):
+    try:
+        product = Product.objects.get(pk=pk)
+        product.delete()
+        return Response({'detail': 'delete was successful'})
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
