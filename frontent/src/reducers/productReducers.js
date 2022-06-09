@@ -42,7 +42,8 @@ export const productDeleteReducer = (state={}, action) => {
         case PRODUCT_DELETE_REQUEST:
             return {loading: true}
         case PRODUCT_DELETE_SUCCESS:
-            return {loading: false, success: true}
+            const d = new Date()
+            return {loading: false, success: d.getTime()}
         case PRODUCT_DELETE_FAIL:
             return {loading: false, error: action.payload}
         default:

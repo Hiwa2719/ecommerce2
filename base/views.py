@@ -110,19 +110,18 @@ def get_product(request, pk):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdminUser])
 def create_product(request):
     data = request.data
-    data.update({'user': request.user})
-    serializer = ProductSerializer(data)
+    serializer = ProductSerializer(data=data)
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(user=request.user)
         return Response(serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['PUT'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdminUser])
 def update_product(request, pk):
     data = request.data
     try:
