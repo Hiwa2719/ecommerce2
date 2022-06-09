@@ -39,6 +39,7 @@ function App() {
                         <Route path="/admin/users-list/" element={<UserListPage/>}/>
                         <Route path="/admin/users-list/edit/:id/" element={<UserEditPage/>}/>
                         <Route path="/admin/products-list/" element={<ProductsListPage/>}/>
+                        {/*<Route path="/admin/users-list/edit/:id/" element={<UserEditPage/>}/>*/}
                     </Routes>
                 </div>
             </main>

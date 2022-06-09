@@ -39,7 +39,7 @@ def get_user_profile(request, pk):
     else:
         try:
             user = User.objects.get(pk=pk)
-        except User.DoesNotExists:
+        except User.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
     serializer = UserSerializer(user)
     return Response(serializer.data)

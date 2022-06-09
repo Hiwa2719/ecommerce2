@@ -3,7 +3,8 @@ import {useDispatch, useSelector} from "react-redux";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import {Link, useNavigate} from "react-router-dom";
-import {listProducts, productDeleteAction} from "../actions/productActions";
+import {listProducts, productCreateAction, productDeleteAction} from "../actions/productActions";
+import {PRODUCT_CREATE_RESET} from "../constants/productConstants";
 
 
 function ProductsListPage() {
@@ -18,6 +19,13 @@ function ProductsListPage() {
         success: deleteSuccess
     } = useSelector(state => state.productDelete)
 
+    const {
+        loading: createLoading,
+        error: createError,
+        success: createSuccess,
+        product: createdProduct
+    } = useSelector(state => state.productCreate)
+
     const {userInfo} = useSelector(state => state.userLogin)
 
     const deleteProduct = (id) => {
@@ -27,16 +35,23 @@ function ProductsListPage() {
     }
 
     const createProductHandler = () => {
-        ///
+        dispatch(productCreateAction())
     }
 
     useEffect(() => {
-        if (userInfo && userInfo.isAdmin) {
-            dispatch(listProducts())
-        } else {
+        dispatch({type: PRODUCT_CREATE_RESET})
+
+        if (!userInfo.isAdmin) {
             navigate('/login')
         }
-    }, [dispatch, userInfo, navigate, deleteSuccess])
+
+        if (createSuccess) {
+            navigate(`/admin/products-list/edit/${createdProduct._id}`)
+        } else {
+            dispatch(listProducts())
+        }
+
+    }, [dispatch, userInfo, navigate, deleteSuccess, createdProduct])
 
     return (
         <div>
@@ -53,6 +68,9 @@ function ProductsListPage() {
 
             {deleteLoading && <Loader/>}
             {deleteError && <Message alertType='alert-danger'>{deleteError}</Message>}
+
+            {createLoading && <Loader/>}
+            {createError && <Message alertType='alert-danger'>{createError}</Message>}
 
             {
                 loading ? <Loader/>
