@@ -16,6 +16,7 @@ import OrderPage from "./pages/OrderPage";
 import UserListPage from "./pages/UserListPage";
 import UserEditPage from "./pages/UserEditPage";
 import ProductsListPage from "./pages/ProductsListPage";
+import ProductEditPage from "./pages/ProductEditPage";
 
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
                         <Route path="/admin/users-list/" element={<UserListPage/>}/>
                         <Route path="/admin/users-list/edit/:id/" element={<UserEditPage/>}/>
                         <Route path="/admin/products-list/" element={<ProductsListPage/>}/>
-                        {/*<Route path="/admin/users-list/edit/:id/" element={<UserEditPage/>}/>*/}
+                        <Route path="/admin/products-list/edit/:id/" element={<ProductEditPage/>}/>
                     </Routes>
                 </div>
             </main>
