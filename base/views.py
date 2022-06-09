@@ -111,6 +111,33 @@ def get_product(request, pk):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def create_product(request):
+    data = request.data
+    data.update({'user': request.user})
+    serializer = ProductSerializer(data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_product(request, pk):
+    data = request.data
+    try:
+        product = Product.objects.get(pk=pk)
+        serializer = ProductSerializer(product, data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Product.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_order_items(request):
     user = request.user
     data = request.data

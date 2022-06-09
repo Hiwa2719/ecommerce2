@@ -7,7 +7,8 @@ app_name = 'base'
 product_urls = [
     path('', views.get_products, name='get_products'),
     path('<int:pk>/', views.get_product, name='get_product'),
-    path('delete/<int:pk>/', views.delete_product, name='delete-product')
+    path('delete/<int:pk>/', views.delete_product, name='delete-product'),
+    path('create/', views.create_product, name='create-product'),
 ]
 
 users_urls = [
