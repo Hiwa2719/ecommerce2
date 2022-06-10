@@ -115,10 +115,9 @@ export const productUpdateAction = (product) => async (dispatch, getState) => {
         dispatch({type: PRODUCT_UPDATE_REQUEST})
 
         const {userLogin: {userInfo}} = getState()
-
         const config = {
             headers : {
-                'Content-type': 'application/json',
+                'Content-type': 'multipart/form-data',
                 Authorization: `Bearer ${userInfo.token}`
             }
         }

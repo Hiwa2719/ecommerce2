@@ -4,7 +4,8 @@ import {Link, useNavigate, useParams} from "react-router-dom";
 import FormContainer from "../components/FormContainer";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
-import {listProductDetails} from "../actions/productActions";
+import {listProductDetails, productUpdateAction} from "../actions/productActions";
+import {PRODUCT_UPDATE_RESET} from "../constants/productConstants";
 
 
 function ProductEditPage() {
@@ -13,7 +14,7 @@ function ProductEditPage() {
 
     const [name, setName] = useState('')
     const [price, setPrice] = useState(0)
-    const [image, setImage] = useState('')
+    const [image, setImage] = useState(undefined)
     const [brand, setBrand] = useState('')
     const [category, setCategory] = useState('')
     const [countInStock, setCountInStock] = useState(0)
@@ -22,26 +23,40 @@ function ProductEditPage() {
     const dispatch = useDispatch()
 
     const {error, loading, product} = useSelector(state => state.productDetails)
-
+    const {error: updateError, loading: updateLoading, success} = useSelector(state => state.productUpdate)
 
     const submitHandler = (e) => {
         e.preventDefault()
-        // todo
+        dispatch(productUpdateAction({
+            _id: product._id,
+            name,
+            price,
+            image,
+            brand,
+            category,
+            countInStock,
+            description,
+        }))
     }
 
     useEffect(() => {
+        if (success) {
+            dispatch({
+                type: PRODUCT_UPDATE_RESET
+            })
+            navigate('/admin/products-list/')
+        }
 
         if (!product || product._id !== Number(id)) {
             dispatch(listProductDetails(id))
         } else {
             setName(product.name)
-            setImage(product.image)
             setBrand(product.brand)
             setCategory(product.category)
             setCountInStock(product.countInStock)
             setDescription(product.description)
         }
-    }, [product, id])
+    }, [product, id, success])
 
     return (
         <div>
@@ -50,6 +65,9 @@ function ProductEditPage() {
             </Link>
             <FormContainer>
                 <h1>Edit Product</h1>
+                {updateLoading && <Loader/>}
+                {updateError && <Message alertType="alert-danger">{updateError}</Message> }
+
                 {loading ? <Loader/> : error ? <Message alertType="alert-danger">{error}</Message> : (
                     <form onSubmit={submitHandler}>
                         <label htmlFor="name">Name</label>
@@ -62,9 +80,10 @@ function ProductEditPage() {
                                onChange={(e) => setPrice(Number(e.target.value))}/>
 
                         <label htmlFor="image">Image</label>
-                        <input type="text" className="form-control mb-3" placeholder="Enter Image" value={image}
+                        <div className="small text-secondary">currently: {product.image}</div>
+                        <input type="file" className="form-control mb-3" placeholder="Enter Image"
                                id="image"
-                               onChange={(e) => setImage(e.target.value)}/>
+                               onChange={(e) => setImage(e.target.files[0])}/>
 
                         <label htmlFor="brand">Brand</label>
                         <input type="text" className="form-control mb-3" placeholder="Enter Brand" value={brand}
