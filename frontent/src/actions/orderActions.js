@@ -1,11 +1,16 @@
 import {
+    ORDER_ALL_LIST_FAIL,
+    ORDER_ALL_LIST_REQUEST,
+    ORDER_ALL_LIST_SUCCESS,
     ORDER_CREATE_FAIL,
     ORDER_CREATE_REQUEST,
     ORDER_CREATE_SUCCESS,
     ORDER_DETAIL_FAIL,
     ORDER_DETAIL_REQUEST,
-    ORDER_DETAIL_SUCCESS, ORDER_LIST_FAIL,
-    ORDER_LIST_REQUEST, ORDER_LIST_SUCCESS,
+    ORDER_DETAIL_SUCCESS,
+    ORDER_LIST_FAIL,
+    ORDER_LIST_REQUEST,
+    ORDER_LIST_SUCCESS,
     ORDER_PAY_FAIL,
     ORDER_PAY_REQUEST,
     ORDER_PAY_SUCCESS
@@ -132,10 +137,39 @@ export const getOrderListAction = () => async (dispatch, getState) => {
             payload: data
         })
 
-    }catch (e) {
+    } catch (e) {
         dispatch({
             type: ORDER_LIST_FAIL,
             payload: e.response && e.response.data ? e.response.data.detail : e.message
+        })
+    }
+}
+
+export const getAllOrdersAction = () => async (dispatch, getState) => {
+    try {
+        dispatch({
+            type: ORDER_ALL_LIST_REQUEST
+        })
+
+        const {userLogin: {userInfo}} = getState()
+
+        const config = {
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`
+            }
+        }
+
+        const {data} = await axios.get('/api/orders/all-orders/', config)
+
+        dispatch({
+            type: ORDER_ALL_LIST_SUCCESS,
+            payload: data
+        })
+    } catch (e) {
+        dispatch({
+            type: ORDER_ALL_LIST_FAIL,
+            payload: e.response && e.response.data.detail ? e.response.data.detail : e.message
         })
     }
 }
