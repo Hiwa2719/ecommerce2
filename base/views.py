@@ -184,8 +184,16 @@ def add_order_items(request):
 
 @api_view()
 @permission_classes([IsAuthenticated])
-def get_orders(request):
+def get_user_orders(request):
     orders = Order.objects.filter(user=request.user).order_by('-createdAt')
+    serializer = OrderSerializer(orders, many=True)
+    return Response(serializer.data)
+
+
+@api_view()
+@permission_classes([IsAdminUser])
+def get_orders(request):
+    orders = Order.objects.all().order_by('-createdAt')
     serializer = OrderSerializer(orders, many=True)
     return Response(serializer.data)
 
