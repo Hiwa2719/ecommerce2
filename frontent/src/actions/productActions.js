@@ -1,6 +1,7 @@
 import {
     PRODUCT_CREATE_FAIL,
-    PRODUCT_CREATE_REQUEST, PRODUCT_CREATE_SUCCESS,
+    PRODUCT_CREATE_REQUEST,
+    PRODUCT_CREATE_SUCCESS,
     PRODUCT_DELETE_FAIL,
     PRODUCT_DELETE_REQUEST,
     PRODUCT_DELETE_SUCCESS,
@@ -10,10 +11,9 @@ import {
     PRODUCT_LIST_FAIL,
     PRODUCT_LIST_REQUEST,
     PRODUCT_LIST_SUCCESS,
-
+    PRODUCT_UPDATE_FAIL,
     PRODUCT_UPDATE_REQUEST,
     PRODUCT_UPDATE_SUCCESS,
-    PRODUCT_UPDATE_FAIL,
 } from '../constants/productConstants'
 import axios from "axios";
 
@@ -69,9 +69,10 @@ export const productDeleteAction = (id) => async (dispatch, getState) => {
             }
         }
 
-        axios.delete(`/api/products/delete/${id}/`, config)
+        await axios.delete(`/api/products/delete/${id}/`, config)
 
         dispatch({type: PRODUCT_DELETE_SUCCESS})
+
     } catch (e) {
         dispatch({
             type: PRODUCT_DELETE_FAIL,
@@ -89,7 +90,7 @@ export const productCreateAction = () => async (dispatch, getState) => {
         const {userLogin: {userInfo}} = getState()
 
         const config = {
-            headers : {
+            headers: {
                 'Content-type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`
             }
@@ -102,7 +103,7 @@ export const productCreateAction = () => async (dispatch, getState) => {
             payload: data
         })
 
-    }catch (e) {
+    } catch (e) {
         dispatch({
             type: PRODUCT_CREATE_FAIL,
             payload: e.response && e.response.data.detail ? e.response.data.detail : e.message
@@ -116,7 +117,7 @@ export const productUpdateAction = (product) => async (dispatch, getState) => {
 
         const {userLogin: {userInfo}} = getState()
         const config = {
-            headers : {
+            headers: {
                 'Content-type': 'multipart/form-data',
                 Authorization: `Bearer ${userInfo.token}`
             }
@@ -134,7 +135,7 @@ export const productUpdateAction = (product) => async (dispatch, getState) => {
             payload: data
         })
 
-    }catch (e) {
+    } catch (e) {
         dispatch({
             type: PRODUCT_UPDATE_FAIL,
             payload: e.response && e.response.data.detail ? e.response.data.detail : e.message

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'stripe',
     'corsheaders',
     'rest_framework',
+    'django_cleanup.apps.CleanupConfig',
     'base',
 ]
 
