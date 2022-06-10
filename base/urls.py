@@ -27,6 +27,7 @@ order_urls = [
     path('<int:pk>/pay/', views.update_order_to_paid, name='pay-order'),
     path('', views.get_user_orders, name='get-user-orders'),
     path('all-orders/', views.get_orders, name='get-orders'),
+    path('make-delivered/<int:pk>/', views.update_order_to_delivered, name='make-delivered')
 ]
 
 urlpatterns = [

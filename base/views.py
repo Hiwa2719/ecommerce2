@@ -291,3 +291,15 @@ def delete_product(request, pk):
         return Response({'detail': 'delete was successful'})
     except Product.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def update_order_to_delivered(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+        order.make_delivered()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)
+    except Order.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
