@@ -13,7 +13,11 @@ import {
     ORDER_LIST_SUCCESS,
     ORDER_PAY_FAIL,
     ORDER_PAY_REQUEST,
-    ORDER_PAY_SUCCESS
+    ORDER_PAY_SUCCESS,
+
+    ORDER_DELIVER_REQUEST,
+    ORDER_DELIVER_SUCCESS,
+    ORDER_DELIVER_FAIL,
 } from "../constants/orderConstants";
 import axios from "axios";
 import {CART_CLEAR_ITEMS} from "../constants/cartConstants";
@@ -169,6 +173,37 @@ export const getAllOrdersAction = () => async (dispatch, getState) => {
     } catch (e) {
         dispatch({
             type: ORDER_ALL_LIST_FAIL,
+            payload: e.response && e.response.data.detail ? e.response.data.detail : e.message
+        })
+    }
+}
+
+
+export const deliverOrderAction = (id) => async (dispatch, getState) => {
+    try {
+        dispatch({
+            type: ORDER_DELIVER_REQUEST
+        })
+
+        const {userLogin: {userInfo}} = getState()
+
+        const config = {
+            headers: {
+                'Content-type': 'application/json',
+                Authorization: `Bearer ${userInfo.token}`
+            }
+        }
+
+        const {data} = await axios.put(`/api/orders/make-delivered/${id}/`, config)
+
+        dispatch({
+            type: ORDER_DELIVER_SUCCESS,
+            payload: data
+        })
+
+    } catch (e) {
+        dispatch({
+            type: ORDER_DELIVER_FAIL,
             payload: e.response && e.response.data.detail ? e.response.data.detail : e.message
         })
     }
