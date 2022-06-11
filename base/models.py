@@ -28,10 +28,19 @@ class Product(models.Model):
     def __str__(self):
         return self.name or super().__str__()
 
+    def update_rating_reviews(self):
+        reviews = self.review_set.all()
+        num_reviews = reviews.count()
+        total = sum([review.rating for review in reviews])
+
+        self.rating = total / num_reviews
+        self.numReviews = num_reviews
+        self.save()
+
 
 class Review(models.Model):
     _id = models.AutoField(primary_key=True, editable=False)
-    product = models.OneToOneField(Product, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, blank=True, null=True)
     rating = models.IntegerField(blank=True, null=True, default=0)

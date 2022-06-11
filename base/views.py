@@ -11,7 +11,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 
 import STRIPE_API_KEYS
-from .models import Product, Order, OrderItem, ShippingAddress
+from .models import Product, Order, OrderItem, ShippingAddress, Review
 from .serializers import ProductSerializer, UserSerializer, UserSerializerWithToken, UserRegisterSerializer, \
     OrderSerializer
 
@@ -302,4 +302,38 @@ def update_order_to_delivered(request, pk):
         serializer = OrderSerializer(order)
         return Response(serializer.data)
     except Order.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_product_review(request, pk):
+    user = request.user
+    data = request.data
+    try:
+        product = Product.objects.get(pk=pk)
+        review = product.review_set.filter(user=user)
+        if review.exists():
+            return Response(
+                {'details': 'product already reviewed.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if data.get('rating') == 0:
+            return Response(
+                {'details': 'please select a rating.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        Review.objects.create(
+            user=user,
+            product=product,
+            name=user.first_name,
+            rating=int(data['rating']),
+            comment=data['comment']
+        )
+        product.update_rating_reviews()
+        return Response('review added')
+
+    except Product.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)

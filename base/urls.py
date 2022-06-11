@@ -30,9 +30,14 @@ order_urls = [
     path('make-delivered/<int:pk>/', views.update_order_to_delivered, name='make-delivered')
 ]
 
+review_urls = [
+    path('create/<int:pk>/', views.create_product_review, name='create-review')
+]
+
 urlpatterns = [
     path('products/', include(product_urls)),
     path('users/', include(users_urls)),
     path('orders/', include(order_urls)),
+    path('reviews/', include(review_urls)),
     path('stripe-payment/<int:pk>/', views.stripe_payment, name='stripe-payment'),
 ]
