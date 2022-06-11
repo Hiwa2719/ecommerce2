@@ -194,7 +194,7 @@ export const deliverOrderAction = (id) => async (dispatch, getState) => {
             }
         }
 
-        const {data} = await axios.put(`/api/orders/make-delivered/${id}/`, config)
+        const {data} = await axios.get(`/api/orders/make-delivered/${id}/`, config)
 
         dispatch({
             type: ORDER_DELIVER_SUCCESS,

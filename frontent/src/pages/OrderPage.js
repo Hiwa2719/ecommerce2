@@ -1,31 +1,36 @@
 import React, {useEffect} from "react";
-import {Link, useParams} from "react-router-dom";
+import {Link, useNavigate, useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {getOrderDetailsAction, payOrderAction} from "../actions/orderActions";
+import {deliverOrderAction, getOrderDetailsAction, payOrderAction} from "../actions/orderActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import axios from "axios";
-import {ORDER_PAY_RESET} from "../constants/orderConstants";
+import {ORDER_DELIVER_RESET, ORDER_PAY_RESET} from "../constants/orderConstants";
 
 function OrderPage() {
     const id = useParams().id
+    const navigate = useNavigate()
     const dispatch = useDispatch()
     const orderDetails = useSelector(state => state.orderDetails)
     const {error, order, loading} = orderDetails
 
-    const userLogin = useSelector(state => state.userLogin)
-    const {userInfo} = userLogin
+    const {userInfo} = useSelector(state => state.userLogin)
+    const {success} = useSelector(state => state.orderPay)
+    const {loading: deliverLoading, success: deliverSuccess} = useSelector(state => state.orderDelivered)
 
-    const orderPay = useSelector(state => state.orderPay)
-    const {success} = orderPay
 
     if (!loading && !error) {
         order.itemssPrice = order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
     }
 
     useEffect(() => {
-        if (!order || order._id !== Number(id) || success) {
+        if(!userInfo){
+            navigate(`/login/?redirect=order/${id}`)
+        }
+
+        if (!order || order._id !== Number(id) || success || deliverSuccess) {
             dispatch({type: ORDER_PAY_RESET})
+            dispatch({type: ORDER_DELIVER_RESET})
             dispatch(getOrderDetailsAction(id))
         } else {
             if (order.stripe_session_id && !order.isPaid && !loading) {
@@ -33,7 +38,7 @@ function OrderPage() {
             }
         }
 
-    }, [order, id, success])
+    }, [order, id, success, deliverSuccess])
 
     const checkoutHandler = (e) => {
         const config = {
@@ -53,6 +58,10 @@ function OrderPage() {
                 console.log(e)
                 dispatch(getOrderDetailsAction(id))
             })
+    }
+
+    const deliverHandler = () => {
+        dispatch(deliverOrderAction(order._id))
     }
 
     return loading ? <Loader/> : error ? (
@@ -161,6 +170,16 @@ function OrderPage() {
                                     </div>
                                 )}
                             </div>
+                            {deliverLoading && <Loader/>}
+                            {userInfo && userInfo.isAdmin && order.isPaid && !order.isDelivered && (
+                                <div className="list-group list-group-flush">
+                                    <div className="list-group-item">
+                                        <button className="btn btn-outline-dark w-100" onClick={deliverHandler}>
+                                            Mark as Delivered
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>

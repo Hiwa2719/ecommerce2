@@ -293,7 +293,7 @@ def delete_product(request, pk):
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['PUT'])
+@api_view()
 @permission_classes([IsAdminUser])
 def update_order_to_delivered(request, pk):
     try:
