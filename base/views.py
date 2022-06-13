@@ -162,7 +162,7 @@ def add_order_items(request):
             try:
                 product = Product.objects.get(_id=item['product'])
             except Product.DoesNotExist:
-                return Response({'details': 'Product Not Found'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'detail': 'Product Not Found'}, status=status.HTTP_400_BAD_REQUEST)
 
             order_item = OrderItem.objects.create(
                 product=product,
@@ -179,7 +179,7 @@ def add_order_items(request):
             serializer = OrderSerializer(order)
             return Response(serializer.data)
 
-    return Response({'details': 'No order items'}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({'detail': 'No order items'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view()
@@ -315,13 +315,13 @@ def create_product_review(request, pk):
         review = product.review_set.filter(user=user)
         if review.exists():
             return Response(
-                {'details': 'product already reviewed.'},
+                {'detail': 'product already reviewed.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
         if data.get('rating') == 0:
             return Response(
-                {'details': 'please select a rating.'},
+                {'detail': 'please select a rating.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

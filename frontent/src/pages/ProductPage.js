@@ -4,7 +4,7 @@ import Rating from '../components/Rating'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import {useDispatch, useSelector} from "react-redux";
-import {listProductDetails} from "../actions/productActions";
+import {listProductDetails, productCreateReviewAction} from "../actions/productActions";
 import {PRODUCT_CREATE_REVIEW_RESET} from "../constants/productConstants";
 
 
@@ -29,11 +29,11 @@ const ProductPage = () => {
 
     const submitHandler = (e) => {
         e.preventDefault()
-        console.log('sending form')
+        dispatch(productCreateReviewAction(product._id, {rating, comment}))
     }
 
     useEffect(() => {
-        if(reviewSuccess){
+        if (reviewSuccess) {
             setRating(0)
             setComment('')
             dispatch({type: PRODUCT_CREATE_REVIEW_RESET})
@@ -126,52 +126,54 @@ const ProductPage = () => {
                             </div>
                             <div className="row mt-3">
                                 <div className="col-md-6">
+                                    <div className="list-group list-group-flush">
+                                        <li className="list-group-item">
+                                            <h4>Write a review</h4>
+
+                                            {reviewLoading && <Loader/>}
+                                            {reviewSuccess && <Message alertType="alert-success">Review Submitted</Message>}
+                                            {reviewError && <Message alertType="alert-danger">{reviewError}</Message>}
+
+                                            {userInfo ? (
+                                                <form onSubmit={submitHandler}>
+                                                    <label htmlFor="rating">Rating</label>
+                                                    <select className="form-select" id="rating"
+                                                            onChange={e => setRating(e.target.value)}>
+                                                        <option value="">Select ....</option>
+                                                        <option value="1">1 - Poor</option>
+                                                        <option value="2">2 - Fair</option>
+                                                        <option value="3">3 - Good</option>
+                                                        <option value="4">4 - Very Good</option>
+                                                        <option value="5">5 - Excellent</option>
+                                                    </select>
+
+                                                    <label htmlFor="comment">Review</label>
+                                                    <textarea className="form-control"
+                                                              id="comment"
+                                                              placeholder="Leave your review here"
+                                                              value={comment}
+                                                              onChange={(e) => setComment(e.target.value)}
+                                                              style={{"height": "100px"}}>
+                                                            </textarea>
+
+                                                    <button className="btn btn-warning mt-2"
+                                                            disabled={reviewLoading}
+                                                            type="submit">Submit
+                                                    </button>
+                                                </form>
+                                            ) : (
+                                                <Message alertType="alert-info">
+                                                    Please <Link to={`/login/?next=product/${product._id}`}>
+                                                    Login
+                                                </Link> to
+                                                    write a review
+                                                </Message>
+                                            )}
+                                        </li>
+                                    </div>
                                     {product.reviews.length === 0 ?
                                         <Message alertType="alert-info">No Reviews</Message> : (
                                             <ul className="list-group list-group-flush">
-                                                <li className="list-group-item">
-                                                    <h4>Write a review</h4>
-
-                                                    {reviewLoading && <Loader/>}
-                                                    {reviewSuccess && <Message alertType="alert-success">Review Submitted</Message> }
-                                                    {reviewError && <Message alertType="alert-danger">{reviewError}</Message> }
-
-                                                    {userInfo ? (
-                                                        <form onSubmit={submitHandler}>
-                                                            <label htmlFor="rating">Rating</label>
-                                                            <select className="form-select" id="rating"
-                                                                    onChange={e => setRating(e.target.value)}>
-                                                                <option value="">Select ....</option>
-                                                                <option value="1">1 - Poor</option>
-                                                                <option value="2">2 - Fair</option>
-                                                                <option value="3">3 - Good</option>
-                                                                <option value="4">4 - Very Good</option>
-                                                                <option value="5">5 - Excellent</option>
-                                                            </select>
-
-                                                            <label htmlFor="comment">Review</label>
-                                                            <textarea className="form-control"
-                                                                      id="comment"
-                                                                      placeholder="Leave your review here"
-                                                                      value={comment}
-                                                                      onChange={(e) => setComment(e.target.value)}
-                                                                      style={{"height": "100px"}}>
-                                                            </textarea>
-
-                                                            <button className="btn btn-warning mt-2"
-                                                                    disabled={reviewLoading}
-                                                                    type="submit">Submit
-                                                            </button>
-                                                        </form>
-                                                    ) : (
-                                                        <Message alertType="alert-info">
-                                                            Please <Link to={`/login/?next=product/${product._id}`}>
-                                                            Login
-                                                        </Link> to
-                                                            write a review
-                                                        </Message>
-                                                    )}
-                                                </li>
                                                 <li className="list-group-item">
                                                     <h3>Reviews</h3>
                                                 </li>
