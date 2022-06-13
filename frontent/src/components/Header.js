@@ -3,6 +3,7 @@ import {Link} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
 import {logout} from '../actions/userActions'
 import {USER_DETAILS_RESET} from "../constants/userConstants";
+import SearchBox from "./SearchBox";
 
 const Header = () => {
     const userLogin = useSelector(state => state.userLogin)
@@ -61,11 +62,7 @@ const Header = () => {
                                 </li>
                             )}
                         </ul>
-                        <form className="d-flex">
-                            <input className="form-control me-2" type="search" placeholder="Search"
-                                   aria-label="Search"/>
-                            <button className="btn btn-outline-success" type="submit">Search</button>
-                        </form>
+                    <SearchBox/>
                     </div>
                 </div>
             </nav>
