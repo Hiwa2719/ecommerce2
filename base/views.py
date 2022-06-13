@@ -1,6 +1,7 @@
 import stripe
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
 from rest_framework import status
@@ -97,7 +98,11 @@ def register_user(request):
 
 @api_view()
 def get_products(request):
-    products = Product.objects.all().order_by('-createdAt')
+    query = request.query_params.get('keyword') or ''
+    q_obj = Q(name__icontains=query) | Q(brand__icontains=query) | Q(category__icontains=query) | \
+            Q(description__icontains=query)
+
+    products = Product.objects.filter(q_obj).order_by('-createdAt')
     serializer = ProductSerializer(products, many=True)
     return Response(serializer.data)
 

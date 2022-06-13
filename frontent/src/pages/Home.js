@@ -4,16 +4,20 @@ import {useDispatch, useSelector} from "react-redux";
 import {listProducts} from "../actions/productActions";
 import Loader from '../components/Loader'
 import Message from "../components/Message";
+import {useLocation} from "react-router-dom";
 
 
 const Home = () => {
+    const location = useLocation()
     const dispatch = useDispatch()
     const productList = useSelector(state => state.productList)
     const {error, loading, products} = productList
 
+    let keyword = location.search ? location.search : ''
+
     useEffect(() => {
-        dispatch(listProducts())
-    }, [dispatch])
+        dispatch(listProducts(keyword))
+    }, [dispatch, keyword])
 
     return (
         <div>
