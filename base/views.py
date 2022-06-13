@@ -1,6 +1,7 @@
 import stripe
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -99,12 +100,17 @@ def register_user(request):
 @api_view()
 def get_products(request):
     query = request.query_params.get('keyword') or ''
+    requested_page = request.query_params.get('page')
+    per_page = request.query_params.get('in-page')
     q_obj = Q(name__icontains=query) | Q(brand__icontains=query) | Q(category__icontains=query) | \
             Q(description__icontains=query)
 
     products = Product.objects.filter(q_obj).order_by('-createdAt')
-    serializer = ProductSerializer(products, many=True)
-    return Response(serializer.data)
+    paginator = Paginator(products, 2)
+    page_obj = paginator.get_page(requested_page)
+
+    serializer = ProductSerializer(page_obj.object_list, many=True)
+    return Response({'products': serializer.data, 'pages': paginator.num_pages, 'page': requested_page})
 
 
 @api_view()
