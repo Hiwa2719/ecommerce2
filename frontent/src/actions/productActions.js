@@ -176,7 +176,7 @@ export const productCreateReviewAction = (id, review) => async (dispatch, getSta
 }
 
 
-export const getTopRatedProductsAction = () => async (dispatch, getState) => {
+export const getTopRatedProductsAction = () => async (dispatch) => {
     try {
         dispatch({
             type: PRODUCT_TOP_REQUEST

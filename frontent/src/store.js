@@ -34,7 +34,7 @@ const reducer = combineReducers({
     productCreate: productCreateReducer,
     productUpdate: productUpdateReducer,
     productCreateReview: productCreateReviewReducer,
-    topRatedProduct: topRatedProductsReducer,
+    topRatedProducts: topRatedProductsReducer,
 
     cart: cartReducer,
     userLogin: userLoginReducer,
