@@ -10,6 +10,7 @@ product_urls = [
     path('delete/<int:pk>/', views.delete_product, name='delete-product'),
     path('create/', views.create_product, name='create-product'),
     path('update/<int:pk>/', views.update_product, name='update-product'),
+    path('top/', views.get_top_products, name='top-products'),
 ]
 
 users_urls = [

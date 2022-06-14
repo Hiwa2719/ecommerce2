@@ -106,7 +106,7 @@ def get_products(request):
             Q(description__icontains=query)
 
     products = Product.objects.filter(q_obj).order_by('-createdAt')
-    paginator = Paginator(products, 2)
+    paginator = Paginator(products, 5)
     page_obj = paginator.get_page(requested_page)
 
     serializer = ProductSerializer(page_obj.object_list, many=True)
@@ -348,3 +348,10 @@ def create_product_review(request, pk):
 
     except Product.DoesNotExist:
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view()
+def get_top_products(request):
+    products = Product.objects.filter(rating__gte=4).order_by('-rating')[:5]
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data)
